@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import difflib
+import base64
 
 # ── Page config (must be the very first st.* call) ───────────────────────────────
 st.set_page_config(
@@ -140,25 +141,43 @@ hr { border-color: rgba(110,30,255,.18) !important; margin: 1.4rem 0 !important;
     text-align: center;
     padding: 2rem 0 2.5rem;
 }
-.hero-title {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(2.4rem, 5vw, 4rem);
-    font-weight: 900;
-    background: linear-gradient(130deg, #00d4ff 0%, #7b2fff 45%, #ff2d78 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 38px rgba(0,212,255,.2));
-    line-height: 1.15;
-    margin-bottom: .3rem;
+
+/* ─ Logo glow ─ */
+.logo-glow-wrap {
+    display: inline-block;
+    filter: drop-shadow(0 0 18px rgba(106,24,240,.75))
+            drop-shadow(0 0 42px rgba(0,212,255,.38));
+    margin-bottom: .75rem;
+    animation: logoPulse 3s ease-in-out infinite;
 }
+.hero-logo-img {
+    max-height: 100px;
+    max-width: 520px;
+    width: auto;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent;
+    border-radius: 0 !important;
+}
+@keyframes logoPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 18px rgba(106,24,240,.75))
+                drop-shadow(0 0 42px rgba(0,212,255,.38));
+    }
+    50% {
+        filter: drop-shadow(0 0 30px rgba(106,24,240,1))
+                drop-shadow(0 0 60px rgba(0,212,255,.6));
+    }
+}
+
 .hero-tagline {
     font-family: 'Rajdhani', sans-serif;
     font-size: .92rem;
-    color: #484878;
-    letter-spacing: 4px;
+    color: #a0a0cc;
+    letter-spacing: 6px;
     text-transform: uppercase;
     margin-bottom: 1.2rem;
+    text-shadow: 0 0 12px rgba(0,212,255,.55), 0 0 28px rgba(106,24,240,.4);
 }
 .hero-badges {
     display: flex;
@@ -429,10 +448,22 @@ with st.sidebar:
 
 
 # ── Hero Section ──────────────────────────────────────────────────────────────────
-st.markdown("""
+
+def get_base64_image(image_path: str) -> str:
+    with open(image_path, "rb") as f:
+        data = f.read()
+    ext = image_path.split(".")[-1].lower()
+    mime = "image/jpeg" if ext in ("jpg", "jpeg") else "image/png"
+    return f"data:{mime};base64,{base64.b64encode(data).decode()}"
+
+LOGO = get_base64_image("Utopiaverse_logo.jpg")
+
+st.markdown(f"""
 <div class="hero-wrap">
-  <div class="hero-title">🎮 Utopiaverse</div>
-  <div class="hero-tagline">Discover &nbsp;·&nbsp; Play &nbsp;·&nbsp; Repeat</div>
+  <div class="logo-glow-wrap">
+    <img src="{LOGO}" class="hero-logo-img" alt="Utopiaverse Logo"/>
+  </div>
+  <div class="hero-tagline">DISCOVER &nbsp;·&nbsp; PLAY &nbsp;·&nbsp; REPEAT</div>
   <div class="hero-badges">
     <span class="hero-badge">⚡ KNN Algorithm</span>
     <span class="hero-badge">🔍 TF-IDF Vectorization</span>
